@@ -1,15 +1,16 @@
-CREATE OR REPLACE FUNCTION delete_rejected_match()
+CREATE OR REPLACE FUNCTION delete_if_rejected()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.accepted = FALSE THEN
+    -- Only delete if the accepted value was NOT FALSE before, and now it is FALSE
+    IF NEW.accepted = FALSE AND (OLD.accepted IS DISTINCT FROM NEW.accepted) THEN
         DELETE FROM matches WHERE match_id = NEW.match_id;
-        RETURN NULL;
     END IF;
-    RETURN NEW;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_delete_rejected_match
-BEFORE INSERT OR UPDATE ON matches
+AFTER UPDATE ON matches
 FOR EACH ROW
-EXECUTE FUNCTION delete_rejected_match();
+WHEN (NEW.accepted = FALSE AND OLD.accepted IS DISTINCT FROM NEW.accepted)
+EXECUTE FUNCTION delete_if_rejected();

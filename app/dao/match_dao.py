@@ -2,6 +2,7 @@ from app.db import get_db_connection
 from app.entities.match import Match
 from datetime import datetime
 from app.db import get_db_connection
+from dao.round_dao import initialize_rounds_for_match
 
 def create_match_request(player1_username, player2_username):
     conn = get_db_connection()
@@ -24,11 +25,10 @@ def create_match_request(player1_username, player2_username):
     conn.close()
     return match_id
 
-def accept_match_request(match_id, player2_username):
+def accept_match_request(match_id, player2_username, accept):
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Check if match exists, accepted is null and player2 matches
     cur.execute("""
         SELECT accepted, player2_username FROM matches
         WHERE match_id = %s
@@ -40,26 +40,38 @@ def accept_match_request(match_id, player2_username):
         conn.close()
         return False, "Match not found"
 
-    accepted, db_player2 = row
-    if accepted is not None:
+    accepted_status, db_player2 = row
+    if accepted_status is not None:
         cur.close()
         conn.close()
         return False, "Match already accepted or rejected"
+
     if db_player2 != player2_username:
         cur.close()
         conn.close()
-        return False, "You are not authorized to accept this match"
+        return False, "You are not authorized to accept or reject this match"
 
-    # Accept match: set accepted=true, match_state=on_going, start_time=now()
-    cur.execute("""
-        UPDATE matches
-        SET accepted = TRUE,
-            match_state = 'on_going',
-            start_time = CURRENT_TIMESTAMP
-        WHERE match_id = %s
-    """, (match_id,))
+    if accept:
+        cur.execute("""
+            UPDATE matches
+            SET accepted = TRUE,
+                match_state = 'on_going',
+                start_time = CURRENT_TIMESTAMP
+            WHERE match_id = %s AND accepted IS NULL AND player2_username = %s
+        """, (match_id, player2_username))
+        conn.commit()
+        initialize_rounds_for_match(match_id)
+        msg = "Match accepted"
+    else:
+        cur.execute("""
+            UPDATE matches
+            SET accepted = false
+            WHERE match_id = %s AND accepted IS NULL AND player2_username = %s
+        """, (match_id, player2_username))
+        conn.commit()
+        msg = "Match rejected"
 
-    conn.commit()
+
     cur.close()
     conn.close()
-    return True, "Match accepted"
+    return True, msg

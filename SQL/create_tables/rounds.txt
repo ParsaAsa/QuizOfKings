@@ -1,0 +1,19 @@
+CREATE TABLE rounds (
+    round_id SERIAL PRIMARY KEY,
+    match_id INTEGER NOT NULL REFERENCES matches(match_id) ON DELETE CASCADE,
+    round_number INTEGER NOT NULL CHECK (round_number BETWEEN 1 AND 6),
+    round_state TEXT NOT NULL ,
+    turn_started_at TIMESTAMP
+);
+
+
+ALTER TABLE rounds
+    ADD CONSTRAINT round_state_check CHECK (
+        round_state IN ('not_started', 'player1_turn', 'player2_turn', 'done')
+    );
+
+ALTER TABLE rounds
+    ADD CONSTRAINT unique_mr UNIQUE (match_id, round_number);
+
+ALTER TABLE rounds
+    ADD CONSTRAINT round_number_check  CHECK (round_number BETWEEN 1 AND 6);

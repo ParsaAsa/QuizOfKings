@@ -26,17 +26,20 @@ def request_match():
 @match_bp.route("/matches/accept", methods=["POST"])
 @jwt_required()
 def accept_match():
-    print("Headers:", request.headers)
-    print("JWT Identity:", get_jwt_identity())
-
     data = request.get_json()
+
     match_id = data.get("match_id")
-    if not match_id:
+    accept = data.get("accept")  # must be boolean true/false
+
+    if match_id is None:
         return jsonify({"error": "match_id is required"}), 400
+
+    if accept is None or not isinstance(accept, bool):
+        return jsonify({"error": "accept (boolean true or false) is required"}), 400
 
     player2_username = get_jwt_identity()
 
-    success, msg = accept_match_request(match_id, player2_username)
+    success, msg = accept_match_request(match_id, player2_username, accept)
     if not success:
         return jsonify({"error": msg}), 400
 
