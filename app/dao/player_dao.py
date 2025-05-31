@@ -29,3 +29,18 @@ def create_player(username, email, player_password, player_role="normal"):
     cur.close()
     conn.close()
     return player_id
+
+def get_player_by_username(username):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT player_id, username, email, player_password, signup_date, player_role
+        FROM players
+        WHERE username = %s
+    """, (username,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    if row:
+        return Player(*row)
+    return None
