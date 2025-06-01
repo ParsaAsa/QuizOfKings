@@ -17,3 +17,12 @@ ALTER TABLE rounds
 
 ALTER TABLE rounds
     ADD CONSTRAINT round_number_check  CHECK (round_number BETWEEN 1 AND 6);
+
+ALTER TABLE rounds
+ADD COLUMN category_id INT;
+
+ALTER TABLE rounds
+ADD CONSTRAINT fk_rounds_category
+FOREIGN KEY (category_id)
+REFERENCES category(category_id)
+ON DELETE RESTRICT;

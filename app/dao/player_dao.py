@@ -44,3 +44,20 @@ def get_player_by_username(username):
     if row:
         return Player(*row)
     return None
+
+def update_player_role(username: str, new_role: str) -> bool:
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE players
+        SET player_role = %s
+        WHERE username = %s
+    """, (new_role, username))
+
+    updated = cur.rowcount
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return updated > 0

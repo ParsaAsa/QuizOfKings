@@ -2,7 +2,7 @@ from app.db import get_db_connection
 from app.entities.match import Match
 from datetime import datetime
 from app.db import get_db_connection
-from dao.round_dao import initialize_rounds_for_match
+from app.dao.round_dao import initialize_rounds_for_match
 
 def create_match_request(player1_username, player2_username):
     conn = get_db_connection()

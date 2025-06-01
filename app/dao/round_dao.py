@@ -1,5 +1,5 @@
-from entities.round import Round
-from db import get_db_connection
+from app.entities.round import Round
+from app.db import get_db_connection
 
 def create_round(match_id, round_number):
     conn = get_db_connection()
@@ -61,11 +61,32 @@ def initialize_rounds_for_match(match_id):
     cur = conn.cursor()
 
     for round_number in range(1, 7):
+        state = 'player2_turn' if round_number == 1 else 'not_started'
         cur.execute("""
             INSERT INTO rounds (match_id, round_number, round_state)
-            VALUES (%s, %s, 'not_started')
-        """, (match_id, round_number))
+            VALUES (%s, %s, %s)
+        """, (match_id, round_number, state))
 
     conn.commit()
     cur.close()
     conn.close()
+
+def set_round_category(match_id, round_number, category_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE rounds
+        SET category_id = %s
+        WHERE match_id = %s AND round_number = %s
+        RETURNING round_id, match_id, round_number, round_state, turn_started_at, category_id
+    """, (category_id, match_id, round_number))
+
+    row = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    if row:
+        return Round(*row)
+    return None

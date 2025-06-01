@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from dao.round_dao import create_round, get_round, update_round_state
+from app.dao.round_dao import create_round, get_round, update_round_state, set_round_category
 
 round_bp = Blueprint('round_bp', __name__)
 
@@ -42,3 +42,20 @@ def update_round_state_route(match_id, round_number):
         return jsonify({"error": "Round not found or update failed"}), 404
 
     return jsonify(round_obj.__dict__)
+
+@round_bp.route("/rounds/<int:match_id>/<int:round_number>/category", methods=["PUT"])
+@jwt_required()
+def set_round_category_route(match_id, round_number):
+    data = request.get_json()
+    category_id = data.get("category_id")
+
+    if category_id is None:
+        return jsonify({"error": "category_id is required"}), 400
+
+    try:
+        round_obj = set_round_category(match_id, round_number, category_id)
+        if not round_obj:
+            return jsonify({"error": "Round not found or category update failed"}), 404
+        return jsonify(round_obj.__dict__)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

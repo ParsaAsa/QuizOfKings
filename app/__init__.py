@@ -5,6 +5,8 @@ from app.routes.player_routes import player_bp
 import os
 from dotenv import load_dotenv
 from app.routes.match_routes import match_bp
+from app.routes.category_routes import category_bp
+from app.routes.round_routes import round_bp
 
 load_dotenv()  # Load from .env
 
@@ -21,5 +23,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(player_bp)
     app.register_blueprint(match_bp)
+    app.register_blueprint(round_bp)
+    app.register_blueprint(category_bp)
 
     return app

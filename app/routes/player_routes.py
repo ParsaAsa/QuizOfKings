@@ -40,3 +40,28 @@ def login():
 
     access_token = create_access_token(identity=player.username)
     return jsonify(access_token=access_token)
+
+@player_bp.route('/players/<string:username>/role', methods=['PUT'])
+@jwt_required()
+def update_player_role(username):
+    requester_username = get_jwt_identity()
+    requester = get_player_by_username(requester_username)
+
+    if not requester or requester.player_role != "manager":
+        return jsonify({"error": "Only managers can change player roles"}), 403
+
+    data = request.get_json()
+    new_role = data.get("player_role")
+
+    if new_role not in ["admin", "manager"]:
+        return jsonify({"error": "Invalid role. Must be 'admin' or 'manager'"}), 400
+
+    target_player = get_player_by_username(username)
+    if not target_player:
+        return jsonify({"error": "Target player not found"}), 404
+
+    success = player_dao.update_player_role(username, new_role)
+    if not success:
+        return jsonify({"error": "Failed to update player role"}), 500
+
+    return jsonify({"message": f"Player '{username}' role updated to '{new_role}'"}), 200
