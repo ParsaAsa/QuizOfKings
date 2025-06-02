@@ -1,0 +1,15 @@
+CREATE TABLE questions (
+    question_id SERIAL PRIMARY KEY,
+    question_text TEXT NOT NULL,
+    right_option CHAR(1) NOT NULL CHECK (right_option IN ('A', 'B', 'C', 'D')),
+    difficulty TEXT NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+    confirmed BOOLEAN DEFAULT NULL,
+    option_A TEXT NOT NULL,
+    option_B TEXT NOT NULL,
+    option_C TEXT NOT NULL,
+    option_D TEXT NOT NULL,
+    category_id INTEGER NOT NULL REFERENCES category(category_id)
+);
+
+ALTER TABLE questions
+ADD COLUMN author_id INTEGER NOT NULL REFERENCES players(player_id);

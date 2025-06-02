@@ -1,0 +1,24 @@
+CREATE OR REPLACE FUNCTION create_initial_rounds()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Only proceed if accepted changed from NULL to TRUE
+    IF NEW.accepted IS TRUE AND OLD.accepted IS NULL THEN
+        -- Insert 6 rounds
+        FOR i IN 1..6 LOOP
+            INSERT INTO rounds (match_id, round_number, round_state)
+            VALUES (
+                NEW.match_id,
+                i,
+                CASE WHEN i = 1 THEN 'player2_turn' ELSE 'not_started' END
+            );
+        END LOOP;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_create_initial_rounds
+AFTER UPDATE ON matches
+FOR EACH ROW
+WHEN (NEW.accepted IS TRUE AND OLD.accepted IS NULL)
+EXECUTE FUNCTION create_initial_rounds();

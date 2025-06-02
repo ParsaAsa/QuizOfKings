@@ -2,7 +2,6 @@ from app.db import get_db_connection
 from app.entities.match import Match
 from datetime import datetime
 from app.db import get_db_connection
-from app.dao.round_dao import initialize_rounds_for_match
 
 def create_match_request(player1_username, player2_username):
     conn = get_db_connection()
@@ -60,7 +59,6 @@ def accept_match_request(match_id, player2_username, accept):
             WHERE match_id = %s AND accepted IS NULL AND player2_username = %s
         """, (match_id, player2_username))
         conn.commit()
-        initialize_rounds_for_match(match_id)
         msg = "Match accepted"
     else:
         cur.execute("""

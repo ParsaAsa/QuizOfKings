@@ -56,20 +56,6 @@ def update_round_state(match_id, round_number, new_state):
         return Round(*row)
     return None
 
-def initialize_rounds_for_match(match_id):
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    for round_number in range(1, 7):
-        state = 'player2_turn' if round_number == 1 else 'not_started'
-        cur.execute("""
-            INSERT INTO rounds (match_id, round_number, round_state)
-            VALUES (%s, %s, %s)
-        """, (match_id, round_number, state))
-
-    conn.commit()
-    cur.close()
-    conn.close()
 
 def set_round_category(match_id, round_number, category_id):
     conn = get_db_connection()

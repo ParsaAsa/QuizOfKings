@@ -1,0 +1,6 @@
+CREATE TABLE question_accept (
+    question_id INTEGER NOT NULL REFERENCES questions(question_id) ON DELETE CASCADE,
+    player_id INTEGER NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
+    confirmed BOOLEAN NOT NULL,
+    PRIMARY KEY (question_id, player_id)
+);
