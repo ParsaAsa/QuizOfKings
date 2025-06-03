@@ -8,7 +8,7 @@ def create_round(match_id, round_number):
     cur.execute("""
         INSERT INTO rounds (match_id, round_number, round_state)
         VALUES (%s, %s, 'not_started')
-        RETURNING round_id, match_id, round_number, round_state, turn_started_at
+        RETURNING match_id, round_number, round_state, turn_started_at, category_id
     """, (match_id, round_number))
 
     row = cur.fetchone()
@@ -23,7 +23,7 @@ def get_round(match_id, round_number):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT round_id, match_id, round_number, round_state, turn_started_at
+        SELECT match_id, round_number, round_state, turn_started_at, category_id
         FROM rounds
         WHERE match_id = %s AND round_number = %s
     """, (match_id, round_number))
@@ -44,7 +44,7 @@ def update_round_state(match_id, round_number, new_state):
         UPDATE rounds
         SET round_state = %s
         WHERE match_id = %s AND round_number = %s
-        RETURNING round_id, match_id, round_number, round_state, turn_started_at
+        RETURNING match_id, round_number, round_state, turn_started_at, category_id
     """, (new_state, match_id, round_number))
 
     row = cur.fetchone()
@@ -65,7 +65,7 @@ def set_round_category(match_id, round_number, category_id):
         UPDATE rounds
         SET category_id = %s
         WHERE match_id = %s AND round_number = %s
-        RETURNING round_id, match_id, round_number, round_state, turn_started_at, category_id
+        RETURNING match_id, round_number, round_state, turn_started_at, category_id
     """, (category_id, match_id, round_number))
 
     row = cur.fetchone()

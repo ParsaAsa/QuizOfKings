@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.dao.round_dao import create_round, get_round, update_round_state, set_round_category
+from app.dao.player_answer_dao import initial_questions
+from app.dao.player_dao import get_player_by_username
+from app.dao.match_dao import get_match_by_id
 
 round_bp = Blueprint('round_bp', __name__)
 
@@ -52,10 +55,38 @@ def set_round_category_route(match_id, round_number):
     if category_id is None:
         return jsonify({"error": "category_id is required"}), 400
 
+    username = get_jwt_identity()
+    player = get_player_by_username(username)
+    if not player:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    match = get_match_by_id(match_id)
+    if not match:
+        return jsonify({"error": "Match not found"}), 404
+
+    round_obj = get_round(match_id, round_number)
+    if not round_obj:
+        return jsonify({"error": "Round not found"}), 404
+
+    # Block if round_state is 'not_started'
+    if round_obj.round_state == "not_started":
+        return jsonify({"error": "Cannot set category before round starts"}), 400
+
+    # Determine who should set the category based on round_number
+    if round_number % 2 == 0:
+        allowed_username = match.player1_username
+    else:
+        allowed_username = match.player2_username
+
+    if player.username != allowed_username:
+        return jsonify({"error": "You are not allowed to set category for this round"}), 403
+
     try:
         round_obj = set_round_category(match_id, round_number, category_id)
         if not round_obj:
             return jsonify({"error": "Round not found or category update failed"}), 404
+
+        initial_questions(match_id, round_number)
         return jsonify(round_obj.__dict__)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

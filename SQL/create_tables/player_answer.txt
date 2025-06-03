@@ -1,0 +1,48 @@
+CREATE TABLE player_answer (
+    match_id INTEGER NOT NULL,
+    round_number INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,
+    player_id INTEGER NOT NULL,
+    player_answer CHAR(1),
+
+    PRIMARY KEY (match_id, round_number, question_id, player_id)
+);
+
+ALTER TABLE player_answer
+ADD CONSTRAINT primary_key PRIMARY KEY (match_id, round_number, question_id, player_id);
+
+ALTER TABLE player_answer
+ADD CONSTRAINT chk_player_answer
+CHECK (player_answer IN ('A', 'B', 'C', 'D') OR player_answer IS NULL);
+
+ALTER TABLE player_answer
+ADD CONSTRAINT fk_player_answer_round
+FOREIGN KEY (match_id, round_number)
+REFERENCES rounds(match_id, round_number)
+ON DELETE CASCADE;
+
+ALTER TABLE player_answer
+ADD CONSTRAINT fk_player_answer_question
+FOREIGN KEY (question_id)
+REFERENCES questions(question_id)
+ON DELETE CASCADE;
+
+ALTER TABLE player_answer
+ADD CONSTRAINT fk_player_answer_player
+FOREIGN KEY (player_id)
+REFERENCES players(player_id)
+ON DELETE CASCADE;
+
+ALTER TABLE player_answer
+ADD question_number integer not null;
+
+ALTER TABLE player_answer
+ADD CONSTRAINT chk_question_number
+CHECK (question_number IN (1, 2, 3));
+
+ALTER TABLE player_answer
+DROP CONSTRAINT player_answer_pkey;
+
+ALTER TABLE player_answer
+ADD CONSTRAINT primary_key
+PRIMARY KEY (match_id, round_number, question_id, question_number, player_id);

@@ -7,7 +7,8 @@ class Match:
     match_id: int
     player1_username: str
     player2_username: str
-    match_state: str  # "on_going" or "done"
-    start_time: datetime
+    match_state: str
+    start_time: Optional[datetime]
     end_time: Optional[datetime]
-    winner: Optional[str]
+    winner_username: Optional[str]
+    accepted: Optional[bool]

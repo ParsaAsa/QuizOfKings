@@ -8,6 +8,7 @@ from app.routes.match_routes import match_bp
 from app.routes.category_routes import category_bp
 from app.routes.round_routes import round_bp
 from app.routes.question_routes import question_bp
+from app.routes.player_answer_routes import player_answer_bp
 load_dotenv()  # Load from .env
 
 def create_app():
@@ -26,5 +27,5 @@ def create_app():
     app.register_blueprint(round_bp)
     app.register_blueprint(category_bp)
     app.register_blueprint(question_bp)
-
+    app.register_blueprint(player_answer_bp)
     return app
