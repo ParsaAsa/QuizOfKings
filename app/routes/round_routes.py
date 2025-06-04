@@ -74,11 +74,11 @@ def set_round_category_route(match_id, round_number):
 
     # Determine who should set the category based on round_number
     if round_number % 2 == 0:
-        allowed_username = match.player1_username
+        allowed_player_id = match.player1_id
     else:
-        allowed_username = match.player2_username
+        allowed_player_id = match.player2_id
 
-    if player.username != allowed_username:
+    if player.player_id != allowed_player_id:
         return jsonify({"error": "You are not allowed to set category for this round"}), 403
 
     try:

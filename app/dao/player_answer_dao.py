@@ -29,30 +29,19 @@ def initial_questions(match_id: int, round_number: int) -> list[PlayerAnswer]:
     if len(question_ids) < 3:
         raise ValueError("Not enough confirmed questions in this category")
 
-    # Get both players from the match
+    # Get both player IDs from the match
     cur.execute("""
-        SELECT player1_username, player2_username FROM matches
+        SELECT player1_id, player2_id FROM matches
         WHERE match_id = %s
     """, (match_id,))
     row = cur.fetchone()
     if not row:
         raise ValueError("Match not found")
-    usernames = [row[0], row[1]]
-
-    # Get player_ids from usernames
-    cur.execute("""
-        SELECT username, player_id FROM players
-        WHERE username IN %s
-    """, (tuple(usernames),))
-    player_ids = {r[0]: r[1] for r in cur.fetchall()}
-
-    if len(player_ids) != 2:
-        raise ValueError("One or both players not found")
+    player_ids = [row[0], row[1]]
 
     inserted_answers = []
     for i, qid in enumerate(question_ids, start=1):
-        for username in usernames:
-            player_id = player_ids[username]
+        for player_id in player_ids:
             cur.execute("""
                 INSERT INTO player_answer (
                     match_id, round_number, question_id, question_number, player_id
@@ -67,16 +56,9 @@ def initial_questions(match_id: int, round_number: int) -> list[PlayerAnswer]:
     conn.close()
     return inserted_answers
 
-def submit_answer_if_null(match_id, round_number, question_number, answer, username):
+def submit_answer_if_null(match_id, round_number, question_number, answer, player_id):
     conn = get_db_connection()
     cur = conn.cursor()
-
-    # Get player_id from username
-    cur.execute("SELECT player_id FROM players WHERE username = %s", (username,))
-    result = cur.fetchone()
-    if not result:
-        raise ValueError("Player not found")
-    player_id = result[0]
 
     # Check if the answer already exists and is not NULL
     cur.execute("""
@@ -101,3 +83,20 @@ def submit_answer_if_null(match_id, round_number, question_number, answer, usern
     cur.close()
     conn.close()
     return True
+
+def get_player_answers(match_id, round_number, player_id) -> list[PlayerAnswer]:
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT match_id, round_number, question_id, question_number, player_id, player_answer
+        FROM player_answer
+        WHERE match_id = %s AND round_number = %s AND player_id = %s
+        ORDER BY question_number
+    """, (match_id, round_number, player_id))
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return [PlayerAnswer(*row) for row in rows]

@@ -5,10 +5,10 @@ from typing import Optional
 @dataclass
 class Match:
     match_id: int
-    player1_username: str
-    player2_username: str
+    player1_id: int
+    player2_id: int
     match_state: str
     start_time: Optional[datetime]
     end_time: Optional[datetime]
-    winner_username: Optional[str]
+    winner_id: Optional[int]
     accepted: Optional[bool]

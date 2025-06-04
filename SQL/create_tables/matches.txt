@@ -16,17 +16,29 @@ ALTER TABLE matches
     ADD CONSTRAINT fk_player2 FOREIGN KEY (player2_username) REFERENCES players(username) ON DELETE CASCADE;
 
 ALTER TABLE matches
-    ADD CONSTRAINT fk_winner FOREIGN KEY (winner_username) REFERENCES players(username);
-
-ALTER TABLE matches
     ADD CONSTRAINT match_state_check CHECK (match_state IN ('not_started', 'on_going', 'done'));
 
-ALTER TABLE matches
-    ADD CONSTRAINT players_different CHECK (player1_username <> player2_username);
+AlTER TABLE matches ADD player1_id integer;
+AlTER TABLE matches ADD player2_id integer;
+AlTER TABLE matches ADD winner_id integer;
 
 ALTER TABLE matches
     ADD CONSTRAINT winner_valid CHECK (
-        winner_username IS NULL OR
-        winner_username = player1_username OR
-        winner_username = player2_username
+        winner_id IS NULL OR
+        winner_id = player1_id OR
+        winner_id = player2_id
     );
+
+
+ALTER TABLE matches
+    ADD CONSTRAINT players_different CHECK (player1_id <> player2_id);
+
+ALTER TABLE matches
+    ADD CONSTRAINT fk_winner FOREIGN KEY (winner_id) REFERENCES players;
+
+ALTER TABLE matches
+    drop player1_username;
+ALTER TABLE matches
+    drop player2_username;
+ALTER TABLE matches
+    drop winner_username;

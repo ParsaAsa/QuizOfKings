@@ -1,0 +1,86 @@
+CREATE OR REPLACE FUNCTION update_round_and_match_state()
+RETURNS TRIGGER AS $$
+DECLARE
+    total_answered INTEGER;
+    current_round_state TEXT;
+    player1_id INTEGER;
+    player2_id INTEGER;
+    current_round_number INTEGER := NEW.round_number;
+    next_round_number INTEGER := current_round_number + 1;
+    next_round_exists BOOLEAN;
+BEGIN
+    -- Count how many questions this player has answered in the round
+    SELECT COUNT(*) INTO total_answered
+    FROM player_answer
+    WHERE match_id = NEW.match_id
+      AND round_number = NEW.round_number
+      AND player_id = NEW.player_id
+      AND player_answer IS NOT NULL;
+
+    IF total_answered = 3 THEN
+        -- Get current round state
+        SELECT round_state INTO current_round_state
+        FROM rounds
+        WHERE match_id = NEW.match_id
+          AND round_number = NEW.round_number;
+
+        -- Get player IDs from the match (updated to use player1_id/player2_id)
+        SELECT player1_id, player2_id INTO player1_id, player2_id
+        FROM matches
+        WHERE match_id = NEW.match_id;
+
+        -- Transition logic
+        IF current_round_state = 'player1_turn' AND NEW.player_id = player1_id THEN
+            IF current_round_number = 6 THEN
+                -- Last round, player1 just finished
+                UPDATE rounds
+                SET round_state = 'done'
+                WHERE match_id = NEW.match_id
+                  AND round_number = current_round_number;
+
+                UPDATE matches
+                SET match_state = 'done'
+                WHERE match_id = NEW.match_id;
+            ELSE
+                -- Switch to player2's turn
+                UPDATE rounds
+                SET round_state = 'player2_turn'
+                WHERE match_id = NEW.match_id
+                  AND round_number = current_round_number;
+            END IF;
+
+        ELSIF current_round_state = 'player2_turn' AND NEW.player_id = player2_id THEN
+            -- Player2 just finished
+            UPDATE rounds
+            SET round_state = 'done'
+            WHERE match_id = NEW.match_id
+              AND round_number = current_round_number;
+
+            -- Check if there's a next round
+            SELECT EXISTS (
+                SELECT 1 FROM rounds
+                WHERE match_id = NEW.match_id AND round_number = next_round_number
+            ) INTO next_round_exists;
+
+            IF next_round_exists THEN
+                UPDATE rounds
+                SET round_state = 'player1_turn'
+                WHERE match_id = NEW.match_id AND round_number = next_round_number;
+            ELSE
+                UPDATE matches
+                SET match_state = 'done'
+                WHERE match_id = NEW.match_id;
+            END IF;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trg_update_round_and_match_state
+AFTER UPDATE OF player_answer ON player_answer
+FOR EACH ROW
+WHEN (NEW.player_answer IS NOT NULL AND OLD.player_answer IS NULL)
+EXECUTE FUNCTION update_round_and_match_state();
