@@ -1,0 +1,31 @@
+CREATE OR REPLACE FUNCTION update_player_stats_on_match_done()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Only run if match has just transitioned to 'done'
+    IF NEW.match_state = 'done' AND OLD.match_state IS DISTINCT FROM 'done' THEN
+        -- Upsert total_matches for both players
+        INSERT INTO player_stat (player_id, total_matches)
+        VALUES (NEW.player1_id, 1)
+        ON CONFLICT (player_id) DO UPDATE SET total_matches = player_stat.total_matches + 1;
+
+        INSERT INTO player_stat (player_id, total_matches)
+        VALUES (NEW.player2_id, 1)
+        ON CONFLICT (player_id) DO UPDATE SET total_matches = player_stat.total_matches + 1;
+
+        -- If there's a winner, increment wins
+        IF NEW.winner_id IS NOT NULL THEN
+            INSERT INTO player_stat (player_id, wins)
+            VALUES (NEW.winner_id, 1)
+            ON CONFLICT (player_id) DO UPDATE SET wins = player_stat.wins + 1;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_player_stats_on_match_done
+AFTER UPDATE OF match_state ON matches
+FOR EACH ROW
+WHEN (NEW.match_state = 'done' AND OLD.match_state IS DISTINCT FROM 'done')
+EXECUTE FUNCTION update_player_stats_on_match_done();

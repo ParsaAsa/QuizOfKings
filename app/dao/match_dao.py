@@ -2,6 +2,8 @@ from app.db import get_db_connection
 from app.entities.match import Match
 from datetime import datetime
 from typing import Optional
+from app.db import fetch_all, fetch_one, execute_query
+from flask import jsonify
 
 def create_match_request(player1_username, player2_username):
     conn = get_db_connection()
@@ -132,3 +134,39 @@ def update_match_state(match_id: int, state: str):
     conn.commit()
     cur.close()
     conn.close()
+
+# Get all ongoing matches for a player (as player1 or player2)
+def get_ongoing_matches_by_username(username):
+    query = """
+        SELECT m.*, p1.username AS player1_username, p2.username AS player2_username
+        FROM matches m
+        JOIN players p1 ON m.player1_id = p1.player_id
+        JOIN players p2 ON m.player2_id = p2.player_id
+        WHERE m.match_state = 'on_going'
+          AND (p1.username = %s OR p2.username = %s)
+    """
+    return [dict(row) for row in fetch_all(query, (username, username))]
+
+# Get all done matches for a player
+def get_done_matches_by_username(username):
+    query = """
+        SELECT m.*, p1.username AS player1_username, p2.username AS player2_username
+        FROM matches m
+        JOIN players p1 ON m.player1_id = p1.player_id
+        JOIN players p2 ON m.player2_id = p2.player_id
+        WHERE m.match_state = 'done'
+          AND (p1.username = %s OR p2.username = %s)
+    """
+    return [dict(row) for row in fetch_all(query, (username, username))]
+
+# Get all match requests (accept is null) for a player
+def get_match_requests_by_username(username):
+    query = """
+        SELECT m.*, p1.username AS player1_username, p2.username AS player2_username
+        FROM matches m
+        JOIN players p1 ON m.player1_id = p1.player_id
+        JOIN players p2 ON m.player2_id = p2.player_id
+        WHERE m.accepted IS NULL
+          AND p2.username = %s
+    """
+    return [dict(row) for row in fetch_all(query, (username,))]
