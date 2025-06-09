@@ -26,3 +26,7 @@ ADD CONSTRAINT fk_rounds_category
 FOREIGN KEY (category_id)
 REFERENCES category(category_id)
 ON DELETE RESTRICT;
+
+ALTER TABLE rounds DROP COLUMN round_id;
+
+ALTER TABLE rounds ADD PRIMARY KEY (match_id, round_number);

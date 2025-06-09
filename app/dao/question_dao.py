@@ -2,7 +2,7 @@ from app.db import get_db_connection
 from app.entities.question import Question
 from app.entities.question_accept import QuestionAccept
 from typing import Optional
-
+from app.db import fetch_all
 def get_question_by_id(question_id: int) -> Question | None:
     conn = get_db_connection()
     cur = conn.cursor()
@@ -160,3 +160,18 @@ def accept_question(question_id: int, player_id: int, confirmed: bool) -> Option
     conn.close()
 
     return QuestionAccept(*row)
+
+def get_unconfirmed_questions():
+    query = """
+        SELECT q.question_id, q.question_text, q.right_option, q.difficulty,
+               q.confirmed, q.option_A, q.option_B, q.option_C, q.option_D,
+               q.category_id, q.author_id, c.title as category_title,
+               p.username as author_username
+        FROM questions q
+        JOIN category c ON q.category_id = c.category_id
+        JOIN players p ON q.author_id = p.player_id
+        WHERE q.confirmed IS NULL
+        ORDER BY q.question_id DESC
+    """
+    rows = fetch_all(query)
+    return [dict(row) for row in rows]

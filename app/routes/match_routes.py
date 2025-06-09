@@ -63,10 +63,23 @@ def get_ongoing_matches_route():
     return jsonify(matches), 200
 
 
-
 @match_bp.route("/matches/pending_requests", methods=["GET"])
 @jwt_required()
 def get_pending_match_requests_route():
     username = get_jwt_identity()
     matches = get_match_requests_by_username(username)
     return jsonify(matches), 200
+
+@match_bp.route("/matches/<int:match_id>/status", methods=["GET"])
+@jwt_required()
+def get_match_status_route(match_id):
+    # You can get current user if you want to check authorization:
+    current_username = get_jwt_identity()
+
+    # Call the DAO method
+    status = match_dao.get_match_status(match_id)
+
+    if status is None:
+        return jsonify({"error": "No active round or match not found"}), 404
+
+    return jsonify(status), 200

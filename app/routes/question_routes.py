@@ -104,3 +104,15 @@ def accept_question_route(question_id):
     if success:
         return jsonify({"message": "Question confirmation status updated"})
     return jsonify({"error": "Failed to update confirmation"}), 500
+
+@question_bp.route("/questions/unconfirmed", methods=["GET"])
+@jwt_required()
+def get_unconfirmed_questions_route():
+    username = get_jwt_identity()
+    player = player_dao.get_player_by_username(username)
+
+    if not player or player.player_role not in ["admin", "manager"]:
+        return jsonify({"error": "Only admin or manager can view unconfirmed questions"}), 403
+
+    questions = question_dao.get_unconfirmed_questions()
+    return jsonify(questions)

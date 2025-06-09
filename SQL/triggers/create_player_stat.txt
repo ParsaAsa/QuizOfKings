@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION create_player_stat()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO player_stat (player_id, total_matches, wins)
+    VALUES (NEW.player_id, 0, 0);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_create_player_stat
+AFTER INSERT ON players
+FOR EACH ROW
+EXECUTE FUNCTION create_player_stat();

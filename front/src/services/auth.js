@@ -4,7 +4,7 @@ export const authService = {
     // Login user
     login: async (username, password) => {
         try {
-            const response = await api.post('/players/login', {
+            const response = await api.post('/api/players/login', {
                 username,
                 password,
             });

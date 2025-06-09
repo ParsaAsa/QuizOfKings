@@ -170,3 +170,84 @@ def get_match_requests_by_username(username):
           AND p2.username = %s
     """
     return [dict(row) for row in fetch_all(query, (username,))]
+
+def get_match_status(match_id: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # 1. Get active round info (include category_id)
+    cur.execute("""
+        SELECT round_number, round_state, category_id
+        FROM rounds
+        WHERE match_id = %s AND round_state IN ('player1_turn', 'player2_turn')
+        LIMIT 1
+    """, (match_id,))
+    round_row = cur.fetchone()
+
+    if not round_row:
+        cur.close()
+        conn.close()
+        return None  # no active round found
+
+    round_number, round_state, category_id = round_row
+
+    # 2. Get player ids and usernames
+    cur.execute("""
+        SELECT m.player1_id, m.player2_id, p1.username AS player1_username, p2.username AS player2_username
+        FROM matches m
+        JOIN players p1 ON m.player1_id = p1.player_id
+        JOIN players p2 ON m.player2_id = p2.player_id
+        WHERE m.match_id = %s
+    """, (match_id,))
+    players_row = cur.fetchone()
+    if not players_row:
+        cur.close()
+        conn.close()
+        return None
+
+    player1_id, player2_id, player1_username, player2_username = players_row
+
+    # 3. Calculate player scores
+    cur.execute("""
+        SELECT pa.player_id, COUNT(*) FILTER (WHERE pa.player_answer = q.right_option) AS correct_answers
+        FROM player_answer pa
+        JOIN questions q ON pa.question_id = q.question_id
+        WHERE pa.match_id = %s
+        GROUP BY pa.player_id
+    """, (match_id,))
+    scores = {player1_id: 0, player2_id: 0}
+    for player_id, correct_count in cur.fetchall():
+        scores[player_id] = correct_count
+
+    # 4. Determine current player's turn
+    current_turn_username = None
+    if round_state == 'player1_turn':
+        current_turn_username = player1_username
+    elif round_state == 'player2_turn':
+        current_turn_username = player2_username
+
+    # 5. Determine if it's category select time
+    # (Only if category is not yet set AND it's the selecting player's turn)
+    is_even_round = (round_number % 2 == 0)
+    category_not_set = category_id is None
+
+    category_select_time = False
+    if category_not_set:
+        if is_even_round and round_state == 'player1_turn':
+            category_select_time = True
+        elif not is_even_round and round_state == 'player2_turn':
+            category_select_time = True
+
+    cur.close()
+    conn.close()
+
+    return {
+        "current_turn": current_turn_username,
+        "round_number": round_number,
+        "category_select_time": category_select_time,
+        "score": scores,
+        "player1_id": player1_id,
+        "player2_id": player2_id,
+        "player1_username": player1_username,
+        "player2_username": player2_username,
+    }

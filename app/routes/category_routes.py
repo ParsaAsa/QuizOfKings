@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.dao.player_dao import get_player_by_username
-from app.dao.category_dao import create_category, get_category_by_title
+from app.dao.category_dao import create_category, get_category_by_title, get_random_unused_categories, get_all_categories
+from app.db import fetch_all
 
 category_bp = Blueprint('category_bp', __name__)
 
@@ -31,3 +32,15 @@ def get_category_route(title):
         return jsonify({"error": "Category not found"}), 404
 
     return jsonify({"category_id": category.category_id, "title": category.title}), 200
+
+@category_bp.route("/categories/random/<int:match_id>", methods=["GET"])
+@jwt_required()
+def get_random_categories(match_id):
+    categories = get_random_unused_categories(match_id, limit=3)
+    return jsonify(categories)
+
+@category_bp.route("/categories", methods=["GET"])
+@jwt_required()
+def get_all_categories_route():
+    categories = get_all_categories()
+    return jsonify(categories)

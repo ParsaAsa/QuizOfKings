@@ -1,3 +1,9 @@
 venv/
 .env
 .git
+/front/public
+/front/node_modules
+/front/.gitignore
+/front/package
+/front/package-lock
+/front/README

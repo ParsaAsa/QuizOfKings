@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;700&display=swap');
+
+.game-start-options-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Vazir', sans-serif;
+    direction: rtl;
+}
+
+.game-start-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.game-option-button {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-family: 'Vazir', sans-serif;
+    font-weight: 600;
+    color: #4a5568;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+
+.game-option-button:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 1);
+}
+
+.game-option-button .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.game-option-button .title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.game-option-button .description {
+    font-size: 1rem;
+    color: #718096;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* Alternative button style that matches the original gradient */
+.game-option-button.gradient-style {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    min-height: auto;
+}
+
+.game-option-button.gradient-style:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.game-option-button.gradient-style .description {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Title styling for the page */
+.game-start-title {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-start-subtitle {
+    color: white;
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-start-options-container {
+        padding: 1rem;
+    }
+
+    .game-start-title {
+        font-size: 2rem;
+    }
+
+    .game-start-buttons {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .game-option-button {
+        padding: 1.5rem;
+        min-height: 150px;
+    }
+
+    .game-option-button .icon {
+        font-size: 2.5rem;
+    }
+
+    .game-option-button .title {
+        font-size: 1.3rem;
+    }
+}

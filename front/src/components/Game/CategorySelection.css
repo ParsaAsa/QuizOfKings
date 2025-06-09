@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;700&display=swap');
+
+.category-selection-container {
+    font-family: 'Vazir', sans-serif;
+    max-width: 600px;
+    margin: 3rem auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+    text-align: center;
+}
+
+h2 {
+    font-weight: 700;
+    color: #2c7a7b;
+    /* teal/dark cyan */
+    margin-bottom: 2rem;
+}
+
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.category-btn {
+    background-color: #38b2ac;
+    /* teal */
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.category-btn:hover {
+    background-color: #319795;
+    /* darker teal */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(56, 178, 172, 0.4);
+}
+
+.loading-text,
+.error-text {
+    font-size: 1.2rem;
+    color: #2c7a7b;
+    /* teal */
+    margin-top: 2rem;
+}
