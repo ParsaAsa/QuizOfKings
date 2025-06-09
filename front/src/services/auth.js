@@ -24,7 +24,7 @@ export const authService = {
     // Register user
     register: async (username, email, password) => {
         try {
-            const response = await api.post('/players', {
+            const response = await api.post('/api/players', {
                 username,
                 email,
                 player_password: password,
