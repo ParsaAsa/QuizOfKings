@@ -1,0 +1,80 @@
+/* src/index.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #fceabb, #f8b500);
+    /* bright golden gradient */
+    color: #333;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    color: #4b3f72;
+    /* deep purple */
+}
+
+a {
+    text-decoration: none;
+    color: #0077ff;
+}
+
+button {
+    background-color: #4b3f72;
+    /* deep purple */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #372c59;
+}
+
+input {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+form {
+    max-width: 400px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    background-color: #4b3f72;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 4px solid #f8b500;
+}
+
+nav a {
+    color: white;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 20px;
+}
