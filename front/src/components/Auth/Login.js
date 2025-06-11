@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../../services/auth';
+import { authService } from '../../services/auth'; // Assuming authService has login function
 import './Auth.css';
 
 const Login = () => {
@@ -24,13 +24,35 @@ const Login = () => {
         setLoading(true);
         setError('');
 
+        // Call login function from authService
         const result = await authService.login(formData.username, formData.password);
 
         if (result.success) {
+            // Save token to localStorage (you may already be doing this in login function)
             localStorage.setItem('username', formData.username);
+            localStorage.setItem('access_token', result.token); // Assuming token is returned from login
+
+            // Fetch user data including player_role
+            try {
+                const userRes = await fetch('/api/get_user', {
+                    headers: {
+                        Authorization: `Bearer ${result.token}`,
+                    },
+                });
+
+                if (userRes.ok) {
+                    const userData = await userRes.json();
+                    localStorage.setItem('player_role', userData.player_role); // Save player_role
+                } else {
+                    setError('خطا در بارگذاری اطلاعات کاربر');
+                }
+            } catch (err) {
+                setError('خطا در بارگذاری اطلاعات کاربر');
+            }
+
+            // Navigate to dashboard
             navigate('/dashboard/');
-        }
-        else {
+        } else {
             setError(result.error);
         }
 

@@ -5,6 +5,7 @@ import './Dashboard.css';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const playerRole = localStorage.getItem('player_role');
 
     const handleLogout = () => {
         authService.logout();
@@ -54,6 +55,14 @@ const Dashboard = () => {
                         <p>مشاهده و مدیریت سوالات</p>
                         <button className="option-button" onClick={() => navigate('/question')}>سوالات</button>
                     </div>
+
+                    {playerRole === 'admin' || playerRole === 'manager' ? (
+                        <div className="option-card">
+                            <h3>🛠️ تأیید سوالات</h3>
+                            <p>تأیید یا رد سوالات ارسال شده توسط بازیکنان</p>
+                            <button className="option-button" onClick={() => navigate('/question_accepting')}>مدیریت سوالات</button>
+                        </div>
+                    ) : null}
 
                     <div className="option-card">
                         <h3>🏆 رتبه‌بندی</h3>

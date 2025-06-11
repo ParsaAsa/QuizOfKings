@@ -78,3 +78,20 @@ def get_player_username():
 def get_top_winners_route():
     top_players = get_top_players_by_wins(5)
     return jsonify(top_players)
+
+@player_bp.route("/get_user", methods=["GET"])
+@jwt_required()
+def get_user_by_username_route():
+    username = get_jwt_identity()
+    player = player_dao.get_player_by_username(username)
+
+    if not player:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "player_id": player.player_id,
+        "username": player.username,
+        "email": player.email,
+        "signup_date": player.signup_date,
+        "player_role": player.player_role,
+    })

@@ -7,7 +7,6 @@ import MatchRequests from './components/Game/MatchRequests';
 import CategorySelection from './components/Game/CategorySelection';
 import QuestionRound from './components/Game/QuestionRound';
 import MatchHistory from './components/Game/MatchHistory';
-import Leaderboard from './components/Game/Leaderboard';
 import { authService } from './services/auth';
 import GameStartOptions from './components/Game/GameStartOptions';
 import './App.css';
@@ -17,6 +16,7 @@ import MatchPage from './components/Game/MatchPage';
 import PlayerStats from './components/Game/PlayerStats'
 import CreateQuestion from './components/Game/CreateQuestion';
 import TopPlayers from './components/Game/TopPlayers';
+import AcceptQuestions from './components/Game/AcceptQuestions';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   return authService.isAuthenticated() ? children : <Navigate to="/login" />;
@@ -123,7 +123,14 @@ function App() {
           </ProtectedRoute>} />
 
           <Route path="/game/page/:matchId" element={<MatchPage />} />
-
+          <Route
+            path="/question_accepting"
+            element={
+              <ProtectedRoute>
+                <AcceptQuestions />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/game/page/:matchId/round_number" element={<QuestionRound />} />
           <Route path="/game/page/:matchId/roundNumber" element={<CategorySelection />} />
           <Route path="/player_stats/:username" element={<PlayerStats />} />
