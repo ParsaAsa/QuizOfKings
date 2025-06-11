@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.dao import question_dao, player_dao
 from app.entities.question import Question
+from app.dao.round_dao import get_round
+from app.dao.match_dao import get_match_by_id
 
 question_bp = Blueprint("question_bp", __name__)
 
@@ -115,4 +117,27 @@ def get_unconfirmed_questions_route():
         return jsonify({"error": "Only admin or manager can view unconfirmed questions"}), 403
 
     questions = question_dao.get_unconfirmed_questions()
+    return jsonify(questions)
+
+@question_bp.route("/questions/<int:match_id>/<int:round_number>", methods=["GET"])
+@jwt_required()
+def get_questions_for_round_route(match_id, round_number):
+    username = get_jwt_identity()
+    player = player_dao.get_player_by_username(username)
+
+    if not player:
+        return jsonify({"error": "User not found"}), 404
+
+    round_info = get_round(match_id, round_number)
+    if not round_info:
+        return jsonify({"error": "Round not found"}), 404
+
+    match = get_match_by_id(match_id)
+    if not match:
+        return jsonify({"error": "Match not found"}), 404
+
+    if player.player_id not in [match.player1_id, match.player2_id]:
+        return jsonify({"error": "You are not part of this match"}), 403
+
+    questions = question_dao.get_questions_for_round(match_id, round_number, player.player_id)
     return jsonify(questions)

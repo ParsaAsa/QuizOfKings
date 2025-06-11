@@ -5,7 +5,7 @@ from app.dao.match_dao import get_match_by_id, update_match_state
 from app.dao.round_dao import get_round
 from app.dao.player_answer_dao import get_player_by_username
 from app.dao.round_dao import update_round_state
-
+from app.db import get_db_connection
 player_answer_bp = Blueprint("player_answer_bp", __name__)
 
 @player_answer_bp.route("/player_answers/submit", methods=["POST"])
@@ -75,7 +75,52 @@ def submit_answer_route():
 
             if round_done:
                 if round_number == 6:
-                    update_match_state(match_id, "done")
+                    # Determine winner before setting match done
+                    # Fetch scores from DB (reuse your scoring query or logic)
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    cur.execute("""
+                        SELECT pa.player_id, COUNT(*) FILTER (WHERE pa.player_answer = q.right_option) AS correct_answers
+                        FROM player_answer pa
+                        JOIN questions q ON pa.question_id = q.question_id
+                        WHERE pa.match_id = %s
+                        GROUP BY pa.player_id
+                    """, (match_id,))
+                    scores = {}
+                    for player_id, correct_count in cur.fetchall():
+                        scores[player_id] = correct_count
+                    cur.close()
+                    conn.close()
+
+                    # get player1 and player2 ids from match
+                    match = get_match_by_id(match_id)
+                    p1_id = match.player1_id
+                    p2_id = match.player2_id
+
+                    p1_score = scores.get(p1_id, 0)
+                    p2_score = scores.get(p2_id, 0)
+
+                    if p1_score > p2_score:
+                        winner_id = p1_id
+                    elif p2_score > p1_score:
+                        winner_id = p2_id
+                    else:
+                        winner_id = None  # tie
+
+                    # Now update the match with done state, end_time and winner_id
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    cur.execute("""
+                        UPDATE matches
+                        SET match_state = 'done',
+                            end_time = CURRENT_TIMESTAMP,
+                            winner_id = %s
+                        WHERE match_id = %s
+                    """, (winner_id, match_id))
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+
                 else:
                     next_round = get_round(match_id, round_number + 1)
                     if next_round:
@@ -85,9 +130,11 @@ def submit_answer_route():
                         else:
                             update_round_state(match_id, round_number + 1, "player2_turn")
                     else:
-                        update_match_state(match_id, "done")
+                        # No next round found, so finish the match (same logic as above)
+                        # Could reuse above code or just call a helper function
+                        update_match_state(match_id, "done")  # if you want, expand here too
 
-        return jsonify({"message": "Answer submitted successfully"})
+                    return jsonify({"message": "Answer submitted successfully"})
 
     except (ValueError, PermissionError) as e:
         return jsonify({"error": str(e)}), 403

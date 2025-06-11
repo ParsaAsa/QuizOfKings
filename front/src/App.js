@@ -14,7 +14,9 @@ import './App.css';
 import NewMatchRequest from './components/Game/NewMatchRequest';
 import OngoingMatches from './components/Game/OngoingMatches';
 import MatchPage from './components/Game/MatchPage';
-
+import PlayerStats from './components/Game/PlayerStats'
+import CreateQuestion from './components/Game/CreateQuestion';
+import TopPlayers from './components/Game/TopPlayers';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   return authService.isAuthenticated() ? children : <Navigate to="/login" />;
@@ -98,7 +100,7 @@ function App() {
             path="/leaderboard"
             element={
               <ProtectedRoute>
-                <Leaderboard />
+                <TopPlayers />
               </ProtectedRoute>
             }
           />
@@ -122,10 +124,11 @@ function App() {
 
           <Route path="/game/page/:matchId" element={<MatchPage />} />
 
+          <Route path="/game/page/:matchId/round_number" element={<QuestionRound />} />
           <Route path="/game/page/:matchId/roundNumber" element={<CategorySelection />} />
-
+          <Route path="/player_stats/:username" element={<PlayerStats />} />
           <Route path="/game" element={<GameStartOptions />} />
-
+          <Route path="/question" element={<CreateQuestion />} />
           {/* 404 Route */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

@@ -1,105 +1,150 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./CategorySelection.css";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // import useNavigate for navigation
+import "./CreateQuestion.css";
 
-const CategorySelection = () => {
-  const { matchId, roundNumber } = useParams();
-  const navigate = useNavigate();
+const CreateQuestion = () => {
+  const [formData, setFormData] = useState({
+    question_text: "",
+    option_A: "",
+    option_B: "",
+    option_C: "",
+    option_D: "",
+    right_option: "A",
+    difficulty: "easy",
+    category_id: "",
+  });
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [settingCategory, setSettingCategory] = useState(false);
-  const [categoryAlreadySet, setCategoryAlreadySet] = useState(false);
+  const navigate = useNavigate(); // hook for navigating
 
   useEffect(() => {
-    const fetchStatusAndCategories = async () => {
+    const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("access_token");
-
-        // First, check if category can be selected
-        const statusRes = await axios.get(`/api/matches/${matchId}/status`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch("/api/categories", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        const { category_select_time } = statusRes.data;
-
-        if (!category_select_time) {
-          setCategoryAlreadySet(true);
-          setError("دسترسی به انتخاب موضوع ندارید یا قبلاً انتخاب شده است.");
-          return;
-        }
-
-        // Then fetch random categories
-        const catsRes = await axios.get(`/api/categories/random/${matchId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setCategories(catsRes.data);
+        if (!res.ok) throw new Error("Failed to fetch categories");
+        const data = await res.json();
+        setCategories(data);
       } catch (err) {
-        setError("بارگذاری موضوعات با خطا مواجه شد.");
-      } finally {
-        setLoading(false);
+        setError("خطا در بارگذاری دسته‌بندی‌ها");
       }
     };
 
-    fetchStatusAndCategories();
-  }, [matchId]);
+    fetchCategories();
+  }, []);
 
-  const handleCategoryClick = async (category) => {
-    if (categoryAlreadySet || settingCategory) return;
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    setSettingCategory(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
     setError("");
+
+    console.log("Form Data Submitted:", formData); // Log the data before sending
 
     try {
       const token = localStorage.getItem("access_token");
+      const res = await fetch("/api/questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-      await axios.put(
-        `/api/rounds/${matchId}/${roundNumber}/category`,
-        { category_id: category.category_id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create question");
 
-      navigate(`/game/page/${matchId}`, {
-        state: { category },
+      setMessage("سوال با موفقیت ثبت شد!");
+      setFormData({
+        question_text: "",
+        option_A: "",
+        option_B: "",
+        option_C: "",
+        option_D: "",
+        right_option: "A",
+        difficulty: "easy",
+        category_id: "",
       });
     } catch (err) {
-      setError("ثبت موضوع با خطا مواجه شد.");
-    } finally {
-      setSettingCategory(false);
+      setError(err.message);
     }
   };
 
-  if (loading) return <div className="loading-text">در حال بارگذاری موضوعات...</div>;
-  if (error) return <div className="error-text">{error}</div>;
+  // Function to handle "back" navigation
+  const handleBack = () => {
+    navigate("/dashboard"); // Navigate to the dashboard
+  };
 
   return (
-    <div className="category-selection-container">
-      <h2>موضوع را انتخاب کنید</h2>
-      <div className="category-buttons">
-        {categories.map((cat) => (
-          <button
-            key={cat.category_id}
-            className="category-btn"
-            onClick={() => handleCategoryClick(cat)}
-            disabled={settingCategory || categoryAlreadySet}
-          >
-            {cat.title}
-          </button>
+    <div className="question-dashboard">
+      <h2>📝 ثبت سوال جدید</h2>
+      <form onSubmit={handleSubmit} className="question-form">
+        {message && <div className="success-message">{message}</div>}
+        {error && <div className="error-message">{error}</div>}
+
+        <textarea
+          name="question_text"
+          placeholder="متن سوال"
+          value={formData.question_text}
+          onChange={handleChange}
+          required
+        />
+
+        {["A", "B", "C", "D"].map((opt) => (
+          <input
+            key={opt}
+            type="text"
+            name={`option_${opt}`}
+            placeholder={`گزینه ${opt}`}
+            value={formData[`option_${opt}`]}
+            onChange={handleChange}
+            required
+          />
         ))}
-      </div>
-      {settingCategory && <div className="loading-text">در حال ثبت موضوع...</div>}
+
+        <div className="form-row">
+          <label>گزینه صحیح:</label>
+          <select name="right_option" value={formData.right_option} onChange={handleChange}>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+
+        <div className="form-row"><label>درجه سختی:</label>
+          <select name="difficulty" value={formData.difficulty} onChange={handleChange}>
+            <option value="easy">آسان</option>
+            <option value="medium">متوسط</option>
+            <option value="hard">سخت</option>
+          </select>
+        </div>
+
+        <div className="form-row">
+          <label>دسته‌بندی:</label>
+          <select name="category_id" value={formData.category_id} onChange={handleChange} required>
+            <option value="">انتخاب کنید...</option>
+            {categories.map((cat) => (
+              <option key={cat.category_id} value={cat.category_id}>
+                {cat.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button type="submit" className="submit-button">ثبت سوال</button>
+      </form>
+
+      <button className="back-button" onClick={handleBack}>برگشتن</button> {/* Back button */}
     </div>
   );
 };
 
-export default CategorySelection;
+export default CreateQuestion;

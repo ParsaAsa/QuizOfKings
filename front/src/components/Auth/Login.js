@@ -27,8 +27,10 @@ const Login = () => {
         const result = await authService.login(formData.username, formData.password);
 
         if (result.success) {
-            navigate('/dashboard'); // Redirect to main app
-        } else {
+            localStorage.setItem('username', formData.username);
+            navigate('/dashboard/');
+        }
+        else {
             setError(result.error);
         }
 

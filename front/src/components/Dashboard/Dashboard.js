@@ -36,13 +36,23 @@ const Dashboard = () => {
                     <div className="option-card">
                         <h3>📊 آمار بازی</h3>
                         <p>نتایج و آمار بازی‌های قبلی</p>
-                        <button className="option-button" onClick={() => navigate('/game/history')}>مشاهده آمار</button>
+                        <button
+                            className="option-button"
+                            onClick={() => {
+                                const username = localStorage.getItem('username');
+                                if (username) {
+                                    navigate(`/player_stats/${username}`);
+                                }
+                            }}
+                        >
+                            مشاهده آمار
+                        </button>
                     </div>
 
                     <div className="option-card">
                         <h3>❓ مدیریت سوالات</h3>
                         <p>مشاهده و مدیریت سوالات</p>
-                        <button className="option-button" onClick={() => navigate('/admin/questions')}>سوالات</button>
+                        <button className="option-button" onClick={() => navigate('/question')}>سوالات</button>
                     </div>
 
                     <div className="option-card">

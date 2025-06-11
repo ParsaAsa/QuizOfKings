@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.dao import player_dao
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from app.dao.player_dao import get_player_by_username
+from app.dao.player_dao import get_player_by_username, get_top_players_by_wins
 
 player_bp = Blueprint('player', __name__)
 
@@ -65,3 +65,16 @@ def update_player_role(username):
         return jsonify({"error": "Failed to update player role"}), 500
 
     return jsonify({"message": f"Player '{username}' role updated to '{new_role}'"}), 200
+
+@player_bp.route("/players", methods=["GET"])
+@jwt_required()
+def get_player_username():
+    username = get_jwt_identity()
+    return jsonify({"username": username})
+
+
+@player_bp.route("/players/top_winners", methods=["GET"])
+@jwt_required()
+def get_top_winners_route():
+    top_players = get_top_players_by_wins(5)
+    return jsonify(top_players)

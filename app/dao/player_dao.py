@@ -1,5 +1,6 @@
 from app.db import get_db_connection
 from app.entities.player import Player
+from app.db import fetch_all
 
 def get_player_by_id(player_id):
     conn = get_db_connection()
@@ -61,3 +62,20 @@ def update_player_role(username: str, new_role: str) -> bool:
     conn.close()
 
     return updated > 0
+
+
+def get_top_players_by_wins(limit=5):
+    query = """
+        SELECT p.player_id, p.username, p.player_role, COALESCE(wins.win_count, 0) AS wins
+        FROM players p
+        LEFT JOIN (
+            SELECT winner_id, COUNT(*) AS win_count
+            FROM matches
+            WHERE winner_id IS NOT NULL
+            GROUP BY winner_id
+        ) wins ON p.player_id = wins.winner_id
+        ORDER BY wins DESC
+        LIMIT %s
+    """
+    rows = fetch_all(query, (limit,))
+    return [dict(row) for row in rows]

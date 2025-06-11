@@ -175,3 +175,15 @@ def get_unconfirmed_questions():
     """
     rows = fetch_all(query)
     return [dict(row) for row in rows]
+
+def get_questions_for_round(match_id: int, round_number: int, player_id: int):
+    query = """
+        SELECT q.question_id, q.question_text, q.option_A, q.option_B, q.option_C, q.option_D,
+               q.right_option, pa.question_number
+        FROM player_answer pa
+        JOIN questions q ON pa.question_id = q.question_id
+        WHERE pa.match_id = %s AND pa.round_number = %s AND pa.player_id = %s AND pa.player_answer is null
+        ORDER BY pa.question_number ASC
+    """
+    rows = fetch_all(query, (match_id, round_number, player_id))
+    return [dict(row) for row in rows]
