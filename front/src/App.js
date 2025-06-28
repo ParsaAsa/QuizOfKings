@@ -17,6 +17,7 @@ import PlayerStats from './components/Game/PlayerStats'
 import CreateQuestion from './components/Game/CreateQuestion';
 import TopPlayers from './components/Game/TopPlayers';
 import AcceptQuestions from './components/Game/AcceptQuestions';
+import ChangeRole from './components/Game/ChangeRole';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   return authService.isAuthenticated() ? children : <Navigate to="/login" />;
@@ -131,6 +132,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/role_update"
+            element={
+              <ProtectedRoute>
+                <ChangeRole />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/game/page/:matchId/round_number" element={<QuestionRound />} />
           <Route path="/game/page/:matchId/roundNumber" element={<CategorySelection />} />
           <Route path="/player_stats/:username" element={<PlayerStats />} />

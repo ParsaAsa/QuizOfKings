@@ -56,18 +56,32 @@ const Dashboard = () => {
                         <button className="option-button" onClick={() => navigate('/question')}>سوالات</button>
                     </div>
 
-                    {playerRole === 'admin' || playerRole === 'manager' ? (
+                    {(playerRole === 'admin' || playerRole === 'manager') && (
                         <div className="option-card">
                             <h3>🛠️ تأیید سوالات</h3>
                             <p>تأیید یا رد سوالات ارسال شده توسط بازیکنان</p>
-                            <button className="option-button" onClick={() => navigate('/question_accepting')}>مدیریت سوالات</button>
+                            <button className="option-button" onClick={() => navigate('/question_accepting')}>
+                                مدیریت سوالات
+                            </button>
                         </div>
-                    ) : null}
+                    )}
+
+                    {playerRole === 'manager' && (
+                        <div className="option-card">
+                            <h3>👤 مدیریت نقش‌ها</h3>
+                            <p>تغییر نقش بازیکنان به ادمین یا منیجر</p>
+                            <button className="option-button" onClick={() => navigate('/role_update')}>
+                                تغییر نقش بازیکن
+                            </button>
+                        </div>
+                    )}
 
                     <div className="option-card">
                         <h3>🏆 رتبه‌بندی</h3>
                         <p>جدول رتبه‌بندی بازیکنان</p>
-                        <button className="option-button" onClick={() => navigate('/leaderboard')}>رتبه‌بندی</button>
+                        <button className="option-button" onClick={() => navigate('/leaderboard')}>
+                            رتبه‌بندی
+                        </button>
                     </div>
                 </div>
             </main>

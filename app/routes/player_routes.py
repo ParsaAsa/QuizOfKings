@@ -48,23 +48,24 @@ def update_player_role(username):
     requester = get_player_by_username(requester_username)
 
     if not requester or requester.player_role != "manager":
-        return jsonify({"error": "Only managers can change player roles"}), 403
+        return jsonify({"error": "فقط مدیرها می‌توانند نقش بازیکنان را تغییر دهند"}), 403
 
     data = request.get_json()
     new_role = data.get("player_role")
 
     if new_role not in ["admin", "manager"]:
-        return jsonify({"error": "Invalid role. Must be 'admin' or 'manager'"}), 400
+        return jsonify({"error": "نقش وارد شده نامعتبر است. نقش باید 'admin' یا 'manager' باشد"}), 400
 
     target_player = get_player_by_username(username)
     if not target_player:
-        return jsonify({"error": "Target player not found"}), 404
+        return jsonify({"error": "بازیکن مورد نظر پیدا نشد"}), 404
 
     success = player_dao.update_player_role(username, new_role)
     if not success:
-        return jsonify({"error": "Failed to update player role"}), 500
+        return jsonify({"error": "خطا در تغییر نقش بازیکن"}), 500
 
-    return jsonify({"message": f"Player '{username}' role updated to '{new_role}'"}), 200
+    # Persian response:
+    return jsonify({"message": f"نقش بازیکن '{username}' با موفقیت به '{new_role}' تغییر یافت"}), 200
 
 @player_bp.route("/players", methods=["GET"])
 @jwt_required()

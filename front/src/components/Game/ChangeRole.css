@@ -1,0 +1,23 @@
+.role-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.role-form input,
+.role-form select {
+    padding: 8px 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.success-message {
+    color: green;
+    margin-bottom: 8px;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 8px;
+}
