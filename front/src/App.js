@@ -6,7 +6,6 @@ import Dashboard from './components/Dashboard/Dashboard';
 import MatchRequests from './components/Game/MatchRequests';
 import CategorySelection from './components/Game/CategorySelection';
 import QuestionRound from './components/Game/QuestionRound';
-import MatchHistory from './components/Game/MatchHistory';
 import { authService } from './services/auth';
 import GameStartOptions from './components/Game/GameStartOptions';
 import './App.css';
@@ -88,14 +87,6 @@ function App() {
             }
           />
 
-          <Route
-            path="/game/history"
-            element={
-              <ProtectedRoute>
-                <MatchHistory />
-              </ProtectedRoute>
-            }
-          />
 
           <Route
             path="/leaderboard"

@@ -62,7 +62,7 @@ const AcceptQuestions = () => {
                         <div key={question.question_id} className="question-card">
                             <h3>{question.question_text}</h3>
                             <p><strong>دسته‌بندی:</strong> {question.category_title}</p>
-                            <p><strong>سوالات:</strong></p>
+                            <p><strong>گزینه‌ها:</strong></p>
                             <ul>
                                 <li>A: {question.option_a}</li>
                                 <li>B: {question.option_b}</li>
