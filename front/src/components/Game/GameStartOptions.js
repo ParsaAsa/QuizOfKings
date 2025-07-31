@@ -2,14 +2,20 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Dashboard/Dashboard.css'; // reuse dashboard theme
 
+
 const GameStartOptions = () => {
+
     const navigate = useNavigate();
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    }
 
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <div className="header-content">
                     <h1>🎮 شروع بازی</h1>
+                    <button onClick={handleGoToDashboard} className="logout-button">برگشت به داشبورد</button>
                 </div>
             </header>
 

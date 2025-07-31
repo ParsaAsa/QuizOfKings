@@ -10,6 +10,9 @@ const NewMatchRequest = () => {
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
+    const handleGoToGameOptions = () => {
+        navigate('/game')
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -49,6 +52,7 @@ const NewMatchRequest = () => {
             <header className="dashboard-header">
                 <div className="header-content">
                     <h1>🆕 شروع بازی جدید</h1>
+                    <button onClick={handleGoToGameOptions} className="logout-button">بازگشت</button>
                 </div>
             </header>
 

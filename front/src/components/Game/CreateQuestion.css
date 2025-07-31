@@ -1,17 +1,12 @@
 .question-dashboard {
     max-width: 600px;
     margin: 40px auto;
-    background: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
     direction: rtl;
     text-align: right;
-}
-
-.question-dashboard h2 {
-    margin-bottom: 20px;
-    color: #333;
 }
 
 .question-form textarea,
@@ -71,4 +66,11 @@
 
 .back-button:hover {
     background-color: #e0e0e0;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
 }

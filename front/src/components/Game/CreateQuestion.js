@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./CreateQuestion.css";
+import { useNavigate } from 'react-router-dom';
 
 const CreateQuestion = () => {
+
+    const navigate = useNavigate();
+
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    }
     const [formData, setFormData] = useState({
         question_text: "",
         option_A: "",
@@ -81,7 +88,13 @@ const CreateQuestion = () => {
 
     return (
         <div className="question-dashboard">
-            <h2>📝 ثبت سوال جدید</h2>
+            <header className="dashboard-header">
+                <div className="header-content">
+                    <h1>❓ ثبت سوال جدید</h1>
+                    <button onClick={handleGoToDashboard} className="logout-button">برگشت به داشبورد</button>
+                </div>
+            </header>
+
             <form onSubmit={handleSubmit} className="question-form">
                 {message && <div className="success-message">{message}</div>}
                 {error && <div className="error-message">{error}</div>}

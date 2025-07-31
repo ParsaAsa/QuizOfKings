@@ -10,6 +10,9 @@ const AcceptQuestions = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
 
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    }
     useEffect(() => {
         const fetchUnconfirmedQuestions = async () => {
             try {
@@ -52,7 +55,13 @@ const AcceptQuestions = () => {
 
     return (
         <div className="accept-questions-container">
-            <h2>مدیریت سوالات تایید نشده</h2>
+            <header className="dashboard-header">
+                <div className="header-content">
+                    <h1>🛠️ مدیریت سوالات تایید نشده</h1>
+                    <button onClick={handleGoToDashboard} className="logout-button">برگشت به داشبورد</button>
+                </div>
+            </header>
+
             {error && <div className="error-message">{error}</div>}
             <div className="questions-list">
                 {questions.length === 0 ? (

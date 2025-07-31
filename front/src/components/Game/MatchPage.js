@@ -102,7 +102,7 @@ const MatchPage = () => {
                 <p>منتظر نوبت خود باشید...</p>
             )}
 
-            <button className="btn btn-back" onClick={() => navigate(-1)}>
+            <button className="btn btn-back" onClick={() => navigate('/game/active')}>
                 بازگشت
             </button>
         </div>

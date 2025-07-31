@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./PlayerStats.css";
 
 export default function PlayerStatsDashboard() {
+    const navigate = useNavigate();
     const { username } = useParams();            // username from /player_stats/:username
     const [stats, setStats] = useState(null);    // player statistics
     const [matches, setMatches] = useState([]);  // last 3 finished matches
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    }
 
     /** Fetch player stats */
     const fetchStats = async (token) => {
@@ -72,6 +77,13 @@ export default function PlayerStatsDashboard() {
 
     return (
         <div className="dashboard">
+            <header className="dashboard-header">
+                <div className="header-content">
+                    <h1>📊 آمار بازیکن</h1>
+                    <button onClick={handleGoToDashboard} className="logout-button">برگشت به داشبورد</button>
+                </div>
+            </header>
+
             <h2>آمار بازیکن: {username}</h2>
 
             {/* Stats cards */}

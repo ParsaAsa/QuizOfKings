@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './MatchRequests.css';
+import { useNavigate } from 'react-router-dom';
 
 const MatchRequests = () => {
+    const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -10,6 +12,9 @@ const MatchRequests = () => {
 
     const token = localStorage.getItem('access_token');
 
+    const handleGoToGameOptions = () => {
+        navigate('/game');
+    }
     // Fetch pending requests
     useEffect(() => {
         const fetchRequests = async () => {
@@ -60,7 +65,8 @@ const MatchRequests = () => {
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <div className="header-content">
-                    <h1>🎮 درخواست‌های بازی</h1>
+                    <h1>📨 درخواست‌های بازی</h1>
+                    <button onClick={handleGoToGameOptions} className="logout-button">بازگشت</button>
                 </div>
             </header>
 

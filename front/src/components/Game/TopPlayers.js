@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import "./TopPlayers.css";
+import { useNavigate } from 'react-router-dom';
 const TopPlayers = () => {
+    const navigate = useNavigate();
     const [players, setPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const handleGoToDashboard = () => {
+        navigate('/dashboard');
+    }
 
     useEffect(() => {
         const fetchTopPlayers = async () => {
@@ -32,7 +38,13 @@ const TopPlayers = () => {
 
     return (
         <div className="top-players-container">
-            <h2>🏅 بازیکنان برتر</h2>
+            <header className="dashboard-header">
+                <div className="header-content">
+                    <h1>🏅 بازیکنان برتر</h1>
+                    <button onClick={handleGoToDashboard} className="logout-button">برگشت به داشبورد</button>
+                </div>
+            </header>
+
             <table>
                 <thead>
                     <tr>

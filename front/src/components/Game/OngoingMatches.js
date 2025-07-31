@@ -9,6 +9,9 @@ const OngoingMatches = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+    const handleGoToGameOptions = () => {
+        navigate('/game');
+    }
     useEffect(() => {
         const fetchOngoingMatches = async () => {
             try {
@@ -37,7 +40,8 @@ const OngoingMatches = () => {
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <div className="header-content">
-                    <h1>🎮 بازی‌های در حال انجام</h1>
+                    <h1>🔄 بازی‌های در حال انجام</h1>
+                    <button onClick={handleGoToGameOptions} className="logout-button">بازگشت</button>
                 </div>
             </header>
 

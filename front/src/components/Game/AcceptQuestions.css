@@ -1,10 +1,7 @@
 .accept-questions-container {
-    padding: 20px;
-}
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-.accept-questions-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
+    padding: 20px;
 }
 
 .error-message {
@@ -66,4 +63,11 @@
 
 .reject-button:hover {
     background-color: #e53935;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
 }

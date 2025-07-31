@@ -53,8 +53,8 @@ def update_player_role(username):
     data = request.get_json()
     new_role = data.get("player_role")
 
-    if new_role not in ["admin", "manager"]:
-        return jsonify({"error": "نقش وارد شده نامعتبر است. نقش باید 'admin' یا 'manager' باشد"}), 400
+    if new_role not in ["admin", "manager", "normal"]:
+        return jsonify({"error": "نقش وارد شده نامعتبر است. نقش باید 'admin' یا 'manager'یا 'normal' باشد"}), 400
 
     target_player = get_player_by_username(username)
     if not target_player:

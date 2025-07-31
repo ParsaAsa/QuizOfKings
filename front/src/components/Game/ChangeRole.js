@@ -76,6 +76,7 @@ const ChangeRole = () => {
                         >
                             <option value="admin">admin</option>
                             <option value="manager">manager</option>
+                            <option value="normal">normal</option>
                         </select>
 
                         <button type="submit" className="option-button" disabled={loading}>
